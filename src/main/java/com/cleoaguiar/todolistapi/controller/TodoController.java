@@ -24,4 +24,10 @@ public class TodoController {
     public Todo create(@RequestBody Todo todo) {
         return repository.save(todo);
     }
+
+    @GetMapping("/{id}")
+    public Todo getById(@PathVariable Long id) {
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+    }
 }
+
