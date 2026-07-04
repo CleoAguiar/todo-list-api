@@ -2,6 +2,7 @@ package com.cleoaguiar.todolistapi.controller;
 
 import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
+import com.cleoaguiar.todolistapi.service.TodoService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,41 +10,35 @@ import java.util.List;
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
-    private final TodoRepository repository;
+    private final TodoService todoService;
 
-    public TodoController(TodoRepository repository) {
-        this.repository = repository;
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
     }
 
     @GetMapping
     public List<Todo> getAll() {
-        return repository.findAll();
+        return todoService.getAll();
     }
 
     @PostMapping
     public Todo create(@RequestBody Todo todo) {
-        return repository.save(todo);
+        return todoService.create(todo);
     }
 
     @GetMapping("/{id}")
     public Todo getById(@PathVariable Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+        return todoService.getById(id);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        repository.deleteById(id);
+        todoService.delete(id);
     }
 
     @PutMapping("/{id}")
     public Todo update(@PathVariable Long id, @RequestBody Todo updatedTodo) {
-        Todo todo = repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
-
-        todo.setTitle(updatedTodo.getTitle());
-        todo.setDescription(updatedTodo.getDescription());
-        todo.setUpdatedAt();
-
-        return repository.save(todo);
+        return todoService.update(id, updatedTodo);
     }
 }
 
