@@ -34,5 +34,16 @@ public class TodoController {
     public void delete(@PathVariable Long id) {
         repository.deleteById(id);
     }
+
+    @PutMapping("/{id}")
+    public Todo update(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+        Todo todo = repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+
+        todo.setTitle(updatedTodo.getTitle());
+        todo.setDescription(updatedTodo.getDescription());
+        todo.setUpdatedAt();
+
+        return repository.save(todo);
+    }
 }
 
