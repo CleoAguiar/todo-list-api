@@ -1,6 +1,7 @@
 package com.cleoaguiar.todolistapi.service;
 
 import com.cleoaguiar.todolistapi.entity.Todo;
+import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,15 +26,16 @@ public class TodoService {
     }
 
     public Todo getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+        return repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        Todo todo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
+        repository.delete(todo);
     }
 
     public Todo update(Long id, Todo updatedTodo) {
-        Todo todo = repository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+        Todo todo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
 
         todo.setTitle(updatedTodo.getTitle());
         todo.setDescription(updatedTodo.getDescription());
