@@ -1,6 +1,9 @@
 package com.cleoaguiar.todolistapi.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 
 import java.time.LocalDateTime;
 
@@ -10,7 +13,11 @@ public class Todo {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O título é obrigatório.")
+    @Size(max = 100, message = "O título deve ter no máximo 100 caracteres.")
     private String title;
+
+    @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres.")
     private String description;
 
     private LocalDateTime createdAt;
