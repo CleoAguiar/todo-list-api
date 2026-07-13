@@ -1,5 +1,7 @@
 package com.cleoaguiar.todolistapi.service;
 
+import com.cleoaguiar.todolistapi.dto.TodoRequest;
+import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
@@ -13,20 +15,42 @@ import java.util.List;
 public class TodoService {
     private final TodoRepository repository;
 
+    private TodoResponse toResponse(Todo todo) {
+        return new TodoResponse(
+                todo.getId(),
+                todo.getTitle(),
+                todo.getDescription(),
+                todo.getCreatedAt(),
+                todo.getUpdatedAt()
+        );
+    }
+
     public TodoService(TodoRepository repository) {
         this.repository = repository;
     }
 
-    public List<Todo> getAll() {
-        return repository.findAll();
+    public List<TodoResponse> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Todo create(Todo todo) {
-        return repository.save(todo);
+    public TodoResponse create(TodoRequest request) {
+        Todo todo = new Todo();
+        todo.setTitle(request.title());
+        todo.setDescription(request.description());
+
+        Todo savedTodo = repository.save(todo);
+
+        return toResponse(savedTodo);
     }
 
-    public Todo getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
+    public TodoResponse getById(Long id) {
+        Todo todo = repository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException(id));
+
+        return toResponse(todo);
     }
 
     public void delete(Long id) {
@@ -34,13 +58,14 @@ public class TodoService {
         repository.delete(todo);
     }
 
-    public Todo update(Long id, Todo updatedTodo) {
-        Todo todo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
+    public TodoResponse update(Long id, TodoRequest request) {
+        Todo existingTodo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
 
-        todo.setTitle(updatedTodo.getTitle());
-        todo.setDescription(updatedTodo.getDescription());
-        todo.setUpdatedAt();
+        existingTodo.setTitle(request.title());
+        existingTodo.setDescription(request.description());
 
-        return repository.save(todo);
+        Todo updateTodo = repository.save(existingTodo);
+
+        return toResponse(updateTodo);
     }
 }

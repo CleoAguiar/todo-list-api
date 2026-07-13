@@ -1,8 +1,11 @@
 package com.cleoaguiar.todolistapi.controller;
 
+import com.cleoaguiar.todolistapi.dto.TodoRequest;
+import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.service.TodoService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,28 +20,30 @@ public class TodoController {
     }
 
     @GetMapping
-    public List<Todo> getAll() {
+    public List<TodoResponse> getAll() {
         return todoService.getAll();
     }
 
     @PostMapping
-    public Todo create(@Valid @RequestBody Todo todo) {
-        return todoService.create(todo);
+    @ResponseStatus(HttpStatus.CREATED)
+    public TodoResponse create(@Valid @RequestBody TodoRequest request) {
+        return todoService.create(request);
     }
 
     @GetMapping("/{id}")
-    public Todo getById(@PathVariable Long id) {
+    public TodoResponse getById(@PathVariable Long id) {
         return todoService.getById(id);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         todoService.delete(id);
     }
 
     @PutMapping("/{id}")
-    public Todo update(@PathVariable Long id, @Valid @RequestBody Todo updatedTodo) {
-        return todoService.update(id, updatedTodo);
+    public TodoResponse update(@PathVariable Long id, @Valid @RequestBody TodoRequest request) {
+        return todoService.update(id, request);
     }
 }
 
