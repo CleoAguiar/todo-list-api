@@ -6,8 +6,6 @@ import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -20,6 +18,7 @@ public class TodoService {
                 todo.getId(),
                 todo.getTitle(),
                 todo.getDescription(),
+                todo.getStatus(),
                 todo.getCreatedAt(),
                 todo.getUpdatedAt()
         );

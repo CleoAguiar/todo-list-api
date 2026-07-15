@@ -1,5 +1,6 @@
 package com.cleoaguiar.todolistapi.entity;
 
+import com.cleoaguiar.todolistapi.enums.TodoStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,11 @@ public class Todo {
     private Long id;
     private String title;
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TodoStatus status = TodoStatus.TODO;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -47,6 +53,10 @@ public class Todo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public TodoStatus getStatus() {
+        return status;
     }
 
     public LocalDateTime getCreatedAt() {
