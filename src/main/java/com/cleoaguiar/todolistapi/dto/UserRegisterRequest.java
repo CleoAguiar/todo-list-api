@@ -1,21 +1,12 @@
-package com.cleoaguiar.todolistapi.entity;
+package com.cleoaguiar.todolistapi.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class UserRegisterRequest {
     @NotBlank(message = "O nome do usuário é obrigatório.")
-    @Column(nullable = false, unique = true)
     private String username;
 
     @NotBlank(message = "A senha é obrigatória.")
-    @Column(nullable = false)
     private String password;
 
     public String getUsername() {
@@ -34,5 +25,3 @@ public class User {
         this.password = password;
     }
 }
-
-
