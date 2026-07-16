@@ -1,6 +1,7 @@
 package com.cleoaguiar.todolistapi.controller;
 
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
+import com.cleoaguiar.todolistapi.dto.UserResponse;
 import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.service.UserService;
 import jakarta.validation.Valid;
@@ -21,8 +22,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
         User user = service.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

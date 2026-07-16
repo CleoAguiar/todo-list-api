@@ -10,11 +10,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O nome do usuário é obrigatório.")
     @Column(nullable = false, unique = true)
     private String username;
 
-    @NotBlank(message = "A senha é obrigatória.")
     @Column(nullable = false)
     private String password;
 
