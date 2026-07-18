@@ -6,6 +6,9 @@ public class UserRegisterRequest {
     @NotBlank(message = "O nome do usuário é obrigatório.")
     private String username;
 
+    @NotBlank
+    private String email;
+
     @NotBlank(message = "A senha é obrigatória.")
     private String password;
 
@@ -13,15 +16,9 @@ public class UserRegisterRequest {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getEmail() { return email; }
 
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }
