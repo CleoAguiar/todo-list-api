@@ -4,7 +4,6 @@ import com.cleoaguiar.todolistapi.dto.AuthRequest;
 import com.cleoaguiar.todolistapi.dto.AuthResponse;
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
 import com.cleoaguiar.todolistapi.dto.UserResponse;
-import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -34,6 +33,5 @@ public class AuthController {
         authService.login(authRequest);
 
         return ResponseEntity.ok(new AuthResponse("token"));
-
     }
 }
