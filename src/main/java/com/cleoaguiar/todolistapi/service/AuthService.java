@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository repository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public User register(UserRegisterRequest request) {
@@ -31,7 +33,7 @@ public class AuthService {
         return repository.save(user);
     }
 
-    public void login(AuthRequest authRequest) {
+    public String login(AuthRequest authRequest) {
         User user = repository.findByEmail(authRequest.getEmail())
                         .orElseThrow(() ->
                                 new IllegalArgumentException("E-mail ou senha inválidos"));
@@ -40,8 +42,6 @@ public class AuthService {
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
-        // gerar JWT
-
-        // retornar token
+        return jwtService.generateToken(user.getEmail());
     }
 }
