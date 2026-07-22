@@ -33,6 +33,18 @@ public class TodoService {
         return (User) authentication.getPrincipal();
     }
 
+    private Todo getOwnedTodo(Long id) {
+        Todo todo = repository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException(id));
+
+        User authenticatedUser = getAuthenticatedUser();
+
+        if(!todo.getUser().getEmail().equals(authenticatedUser.getEmail())) {
+            throw new ForbiddenException();
+        }
+        return todo;
+    }
+
     public TodoService(TodoRepository repository) {
         this.repository = repository;
     }
@@ -59,23 +71,16 @@ public class TodoService {
     }
 
     public TodoResponse getById(Long id) {
-        Todo todo = repository.findById(id)
-                .orElseThrow(() -> new TodoNotFoundException(id));
-
-        User  authenticatedUser = getAuthenticatedUser();
-        if(!todo.getUser().getId().equals(authenticatedUser.getId())) {
-            throw new ForbiddenException();
-        }
-        return toResponse(todo);
+        return toResponse(getOwnedTodo(id));
     }
 
     public void delete(Long id) {
-        Todo todo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
+        Todo todo = getOwnedTodo(id);
         repository.delete(todo);
     }
 
     public TodoResponse update(Long id, TodoRequest request) {
-        Todo existingTodo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
+        Todo existingTodo = getOwnedTodo(id);
 
         existingTodo.setTitle(request.title());
         existingTodo.setDescription(request.description());
