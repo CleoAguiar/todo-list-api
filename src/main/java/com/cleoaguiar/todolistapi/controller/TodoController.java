@@ -2,7 +2,6 @@ package com.cleoaguiar.todolistapi.controller;
 
 import com.cleoaguiar.todolistapi.dto.TodoRequest;
 import com.cleoaguiar.todolistapi.dto.TodoResponse;
-import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.service.TodoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

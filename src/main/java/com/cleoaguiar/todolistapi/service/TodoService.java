@@ -3,8 +3,12 @@ package com.cleoaguiar.todolistapi.service;
 import com.cleoaguiar.todolistapi.dto.TodoRequest;
 import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.entity.Todo;
+import com.cleoaguiar.todolistapi.entity.User;
+import com.cleoaguiar.todolistapi.exception.ForbiddenException;
 import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,21 +28,30 @@ public class TodoService {
         );
     }
 
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
+    }
+
     public TodoService(TodoRepository repository) {
         this.repository = repository;
     }
 
     public List<TodoResponse> getAll() {
-        return repository.findAll()
+        User authenticatedUser = getAuthenticatedUser();
+
+        return repository.findAllByUser(authenticatedUser)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public TodoResponse create(TodoRequest request) {
+        User authenticatedUser = getAuthenticatedUser();
         Todo todo = new Todo();
         todo.setTitle(request.title());
         todo.setDescription(request.description());
+        todo.setUser(authenticatedUser);
 
         Todo savedTodo = repository.save(todo);
 
@@ -49,6 +62,10 @@ public class TodoService {
         Todo todo = repository.findById(id)
                 .orElseThrow(() -> new TodoNotFoundException(id));
 
+        User  authenticatedUser = getAuthenticatedUser();
+        if(!todo.getUser().getId().equals(authenticatedUser.getId())) {
+            throw new ForbiddenException();
+        }
         return toResponse(todo);
     }
 

@@ -1,7 +1,6 @@
 package com.cleoaguiar.todolistapi.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "users")
@@ -18,6 +17,8 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    public Long getId() { return id; }
 
     public void setUsername(String username) {
         this.username = username;

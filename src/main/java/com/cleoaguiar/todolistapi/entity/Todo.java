@@ -13,13 +13,17 @@ public class Todo {
     private String title;
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TodoStatus status = TodoStatus.TODO;
 
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
+    private LocalDateTime updatedAt;
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -55,9 +59,11 @@ public class Todo {
         this.description = description;
     }
 
-    public TodoStatus getStatus() {
-        return status;
-    }
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
+
+    public TodoStatus getStatus() { return status; }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

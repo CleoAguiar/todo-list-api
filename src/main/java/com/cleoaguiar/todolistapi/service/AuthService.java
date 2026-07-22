@@ -1,7 +1,6 @@
 package com.cleoaguiar.todolistapi.service;
 
 import com.cleoaguiar.todolistapi.dto.AuthRequest;
-import com.cleoaguiar.todolistapi.dto.AuthResponse;
 import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
 import com.cleoaguiar.todolistapi.repository.UserRepository;
