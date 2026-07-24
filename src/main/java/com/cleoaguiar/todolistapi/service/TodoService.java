@@ -7,11 +7,12 @@ import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.exception.ForbiddenException;
 import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TodoService {
@@ -49,13 +50,13 @@ public class TodoService {
         this.repository = repository;
     }
 
-    public List<TodoResponse> getAll() {
+    public Page<TodoResponse> getAll(int page, int limit) {
         User authenticatedUser = getAuthenticatedUser();
 
-        return repository.findAllByUser(authenticatedUser)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+                Pageable pageable = PageRequest.of(page, limit);
+
+        return repository.findAllByUser(authenticatedUser, pageable)
+                .map(this::toResponse);
     }
 
     public TodoResponse create(TodoRequest request) {

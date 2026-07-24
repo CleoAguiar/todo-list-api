@@ -4,10 +4,9 @@ import com.cleoaguiar.todolistapi.dto.TodoRequest;
 import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.service.TodoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/todos")
@@ -19,8 +18,9 @@ public class TodoController {
     }
 
     @GetMapping
-    public List<TodoResponse> getAll() {
-        return todoService.getAll();
+    public Page<TodoResponse> getAll(@RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "10") int limit) {
+        return todoService.getAll(page, limit);
     }
 
     @PostMapping
