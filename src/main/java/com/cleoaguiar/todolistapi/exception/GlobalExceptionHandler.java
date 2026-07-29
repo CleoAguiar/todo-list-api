@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex){
         String message = "Valor inválido informado.";
 
-        if (ex.getMessage().contains("TodoStatus")) {
+        if (ex.getMessage()!= null && ex.getMessage().contains("TodoStatus")) {
             message = "Status inválido. Valores permitidos: TODO, IN_PROGRESS, DONE";
         }
 
