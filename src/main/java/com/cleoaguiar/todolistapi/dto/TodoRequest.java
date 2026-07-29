@@ -1,5 +1,6 @@
 package com.cleoaguiar.todolistapi.dto;
 
+import com.cleoaguiar.todolistapi.enums.TodoStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,5 +10,7 @@ public record TodoRequest (
     String title,
 
     @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres.")
-    String description
+    String description,
+
+    TodoStatus status
 ) {}
