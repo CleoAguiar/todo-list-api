@@ -3,19 +3,12 @@ package com.cleoaguiar.todolistapi.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class AuthRequest {
-    @Email
-    @NotBlank
-    private String email;
+public record AuthRequest(
+        @Email(message = "E-mail inválido.")
+        @NotBlank(message = "O e-mail é obrigatório.")
+        String email,
 
-    @NotBlank
-    private String password;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+        @NotBlank(message = "A senha é obrigatória.")
+        String password
+) {
 }

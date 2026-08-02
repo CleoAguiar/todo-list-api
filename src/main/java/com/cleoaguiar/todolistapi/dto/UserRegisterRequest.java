@@ -1,24 +1,16 @@
 package com.cleoaguiar.todolistapi.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class UserRegisterRequest {
-    @NotBlank(message = "O nome do usuário é obrigatório.")
-    private String username;
+public record UserRegisterRequest(
+        @NotBlank(message = "O nome do usuário é obrigatório.")
+        String username,
 
-    @NotBlank
-    private String email;
+        @Email(message = "E-mail inválido.")
+        @NotBlank(message = "O e-mail é obrigatório.")
+        String email,
 
-    @NotBlank(message = "A senha é obrigatória.")
-    private String password;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() { return email; }
-
-    public String getPassword() {
-        return password;
-    }
-}
+        @NotBlank(message = "A senha é obrigatória.")
+        String password
+) {}
