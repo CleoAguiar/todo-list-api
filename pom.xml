@@ -89,6 +89,14 @@
             <version>0.12.7</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- SpringDoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.9</version>
+        </dependency>
+
     </dependencies>
 
     <build>
