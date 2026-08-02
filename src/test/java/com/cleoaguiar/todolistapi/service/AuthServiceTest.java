@@ -10,11 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -57,5 +55,27 @@ public class AuthServiceTest {
         verify(userRepository).existsByEmail("cleo@email.com");
         verify(passwordEncoder).encode("123456");
         verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEmailAlreadyExists() {
+        UserRegisterRequest request = new UserRegisterRequest(
+                "cleo",
+                "cleo@email.com",
+                "123456"
+        );
+
+        when(userRepository.existsByEmail("cleo@email.com")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> authService.register(request)
+        );
+
+        assertEquals("E-mail já cadastrado", exception.getMessage());
+
+        verify(userRepository).existsByEmail("cleo@email.com");
+        verify(passwordEncoder, never()).encode((anyString()));
+        verify(userRepository, never()).save(any(User.class));
     }
 }
