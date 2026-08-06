@@ -124,4 +124,29 @@ public class AuthServiceTest {
         verify(passwordEncoder, never()).matches(anyString(), anyString());
         verify(jwtService, never()).generateToken(anyString());
     }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordIsInvalid() {
+        AuthRequest request = new AuthRequest("cleo@email.com", "123456");
+
+        User user = new User();
+        user.setUsername("cleo");
+        user.setEmail("cleo@email.com");
+        user.setPassword("senhaCriptografada");
+
+        when(userRepository.findByEmail("cleo@email.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("123456", "senhaCriptografada"))
+                .thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("E-mail ou senha inválidos", exception.getMessage());
+
+        verify(userRepository).findByEmail("cleo@email.com");
+        verify(passwordEncoder).matches("123456", "senhaCriptografada");
+        verify(jwtService, never()).generateToken(anyString());
+    }
 }
