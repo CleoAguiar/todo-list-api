@@ -106,4 +106,22 @@ public class AuthServiceTest {
         verify(passwordEncoder).matches("123456", "senhaCriptografada");
         verify(jwtService).generateToken("cleo@email.com");
     }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFound() {
+        AuthRequest request = new AuthRequest("cleo@email.com", "123456");
+
+        when(userRepository.findByEmail("cleo@email.com")).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("E-mail ou senha inválidos", exception.getMessage());
+
+        verify(userRepository).findByEmail("cleo@email.com");
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+        verify(jwtService, never()).generateToken(anyString());
+    }
 }
