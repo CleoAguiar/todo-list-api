@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -42,14 +44,17 @@ public class TodoServiceTest {
         user.setEmail("cleo@email.com");
         user.setPassword("senhaCriptografada");
 
-        when (authentication.getPrincipal()).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
     void shouldCreateTodoSuccessfully() {
-        TodoRequest request = new TodoRequest("Test Title", "Buy coffee", TodoStatus.TODO);
+        TodoRequest request = new TodoRequest(
+                "Test Title",
+                "Buy coffee",
+                TodoStatus.TODO);
 
         Todo savedTodo = new Todo();
         savedTodo.setTitle("Test Title");
@@ -65,6 +70,41 @@ public class TodoServiceTest {
         assertEquals("Buy coffee", result.description());
         assertEquals(TodoStatus.TODO, result.status());
 
+        verify(todoRepository).save(any(Todo.class));
+    }
+
+    @Test
+    void shouldUpdateTodoSuccessfully() {
+        TodoRequest request = new TodoRequest(
+                "Test Updated Title",
+                "Buy coffee latte",
+                TodoStatus.IN_PROGRESS);
+
+        User savedUser = new User();
+        savedUser.setEmail("cleo@email.com");
+
+        Todo existingTodo = new Todo();
+        existingTodo.setTitle("Test Title");
+        existingTodo.setDescription("Buy coffee");
+        existingTodo.setStatus(TodoStatus.TODO);
+        existingTodo.setUser(savedUser);
+
+        Todo updatedTodo = new Todo();
+        updatedTodo.setTitle("Test Updated Title");
+        updatedTodo.setDescription("Buy coffee latte");
+        updatedTodo.setStatus(TodoStatus.IN_PROGRESS);
+
+        when(todoRepository.findById(1L)).thenReturn(Optional.of(existingTodo));
+        when(todoRepository.save(any(Todo.class))).thenReturn(updatedTodo);
+
+        TodoResponse result = todoService.update(1L, request);
+
+        assertNotNull(result);
+        assertEquals("Test Updated Title", result.title());
+        assertEquals("Buy coffee latte", result.description());
+        assertEquals(TodoStatus.IN_PROGRESS, result.status());
+
+        verify(todoRepository).findById(1L);
         verify(todoRepository).save(any(Todo.class));
     }
 }
