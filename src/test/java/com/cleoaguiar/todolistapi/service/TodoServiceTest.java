@@ -107,4 +107,23 @@ public class TodoServiceTest {
         verify(todoRepository).findById(1L);
         verify(todoRepository).save(any(Todo.class));
     }
+
+    @Test
+    void shouldDeleteTodoSuccessfully() {
+        User savedUser = new User();
+        savedUser.setEmail("cleo@email.com");
+
+        Todo existingTodo = new Todo();
+        existingTodo.setTitle("Test Title");
+        existingTodo.setDescription("Buy coffee");
+        existingTodo.setStatus(TodoStatus.TODO);
+        existingTodo.setUser(savedUser);
+
+        when(todoRepository.findById(1L)).thenReturn(Optional.of(existingTodo));
+
+        todoService.delete(1L);
+
+        verify(todoRepository).findById(1L);
+        verify(todoRepository).delete(any(Todo.class));
+    }
 }
