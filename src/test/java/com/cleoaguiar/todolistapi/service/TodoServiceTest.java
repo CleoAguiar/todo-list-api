@@ -5,6 +5,7 @@ import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.enums.TodoStatus;
+import com.cleoaguiar.todolistapi.exception.ForbiddenException;
 import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -186,6 +187,27 @@ public class TodoServiceTest {
         );
 
         assertEquals("Todo com id 1 não encontrado.", exception.getMessage());
+
+        verify(todoRepository).findById(1L);
+    }
+
+    @Test
+    void shouldThrowForbiddenExceptionWhenUserIsNotOwner() {
+        User savedUser = new User();
+        savedUser.setEmail("outro@email.com");
+
+        Todo existingTodo = new Todo();
+        existingTodo.setTitle("Test Title");
+        existingTodo.setDescription("Buy coffee");
+        existingTodo.setStatus(TodoStatus.TODO);
+        existingTodo.setUser(savedUser);
+
+        when(todoRepository.findById(1L)).thenReturn(Optional.of(existingTodo));
+
+        ForbiddenException exception = assertThrows(
+                ForbiddenException.class,
+                () -> todoService.getById(1L)
+        );
 
         verify(todoRepository).findById(1L);
     }
