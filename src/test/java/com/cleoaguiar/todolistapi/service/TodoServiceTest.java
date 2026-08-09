@@ -12,10 +12,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -148,5 +152,27 @@ public class TodoServiceTest {
         assertEquals(TodoStatus.TODO, result.status());
 
         verify(todoRepository).findById(1L);
+    }
+
+    @Test
+    void shouldGetAllTodosSuccessfully() {
+        Todo existingTodo = new Todo();
+        existingTodo.setTitle("Test Title");
+        existingTodo.setDescription("Buy coffee");
+        existingTodo.setStatus(TodoStatus.TODO);
+
+        List<Todo> todoList = List.of(existingTodo);
+
+        Page<Todo> page = new PageImpl<>(todoList);
+
+        when(todoRepository.findAllByUser(any(User.class), any(Pageable.class))).thenReturn(page);
+
+        Page<TodoResponse> result = todoService.getAll(0, 10);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getTotalElements());
+        assertEquals("Test Title", result.getContent().get(0).title());
+
+        verify(todoRepository).findAllByUser(any(User.class), any(Pageable.class));
     }
 }
