@@ -5,6 +5,7 @@ import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.entity.Todo;
 import com.cleoaguiar.todolistapi.entity.User;
 import com.cleoaguiar.todolistapi.enums.TodoStatus;
+import com.cleoaguiar.todolistapi.exception.TodoNotFoundException;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +23,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class TodoServiceTest {
@@ -48,8 +48,8 @@ public class TodoServiceTest {
         user.setEmail("cleo@email.com");
         user.setPassword("senhaCriptografada");
 
-        when(authentication.getPrincipal()).thenReturn(user);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
+        lenient().when(authentication.getPrincipal()).thenReturn(user);
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
@@ -174,5 +174,19 @@ public class TodoServiceTest {
         assertEquals("Test Title", result.getContent().get(0).title());
 
         verify(todoRepository).findAllByUser(any(User.class), any(Pageable.class));
+    }
+
+    @Test
+    void shouldThrowTodoNotFoundExceptionWhenTodoDoesNotExist() {
+        when(todoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        TodoNotFoundException exception = assertThrows(
+                TodoNotFoundException.class,
+                () -> todoService.getById(1L)
+        );
+
+        assertEquals("Todo com id 1 não encontrado.", exception.getMessage());
+
+        verify(todoRepository).findById(1L);
     }
 }
