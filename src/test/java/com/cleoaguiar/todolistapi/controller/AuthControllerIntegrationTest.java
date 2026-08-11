@@ -24,9 +24,6 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepository;
-
     private final ObjectMapper objectMapper =  new ObjectMapper();
 
     @Test
