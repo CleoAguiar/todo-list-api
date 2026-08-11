@@ -1,0 +1,83 @@
+package com.cleoaguiar.todolistapi.controller;
+
+import com.cleoaguiar.todolistapi.dto.AuthRequest;
+import com.cleoaguiar.todolistapi.dto.TodoRequest;
+import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
+import com.cleoaguiar.todolistapi.enums.TodoStatus;
+import com.cleoaguiar.todolistapi.repository.TodoRepository;
+import com.cleoaguiar.todolistapi.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+public class TodoControllerIntegrationTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    private final ObjectMapper objectMapper =  new ObjectMapper();
+    private String token;
+
+    @BeforeEach
+    void setup() throws Exception {
+        UserRegisterRequest request = new UserRegisterRequest(
+                "cleo",
+                "cleo@email.com",
+                "123456");
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        AuthRequest loginRequest = new AuthRequest(
+                "cleo@email.com",
+                "123456");
+
+        String responseJson = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        this.token = objectMapper.readTree(responseJson).get("token").asText();
+    }
+
+    @Test
+    void shouldCreateTodoSuccessfully() throws Exception {
+        TodoRequest request = new TodoRequest(
+                "My title",
+                "My description",
+                TodoStatus.TODO
+        );
+
+        mockMvc.perform(post("/todos")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title"))
+                .andExpect(jsonPath("$.description").value("My description"));
+    }
+}
