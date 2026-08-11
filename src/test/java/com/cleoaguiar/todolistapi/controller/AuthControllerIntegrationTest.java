@@ -1,5 +1,6 @@
 package com.cleoaguiar.todolistapi.controller;
 
+import com.cleoaguiar.todolistapi.dto.AuthRequest;
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
 import com.cleoaguiar.todolistapi.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,6 +39,31 @@ public class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void shouldLoginSuccessfully() throws Exception {
+        UserRegisterRequest request = new UserRegisterRequest(
+                "cleo",
+                "cleo@email.com",
+                "123456");
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        AuthRequest loginRequest = new AuthRequest(
+                "cleo@email.com",
+                "123456");
+
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists());
+
+
     }
 
 }
