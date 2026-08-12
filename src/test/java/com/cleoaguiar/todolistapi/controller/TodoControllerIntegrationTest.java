@@ -123,8 +123,6 @@ public class TodoControllerIntegrationTest {
 
     @Test
     void shouldUpdateTodoSuccessfully() throws Exception {
-        String todo_id;
-
         TodoRequest request = new TodoRequest(
                 "My title",
                 "My description",
@@ -148,7 +146,7 @@ public class TodoControllerIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        todo_id = objectMapper.readTree(responseJson).get("id").asText();
+        String todo_id = objectMapper.readTree(responseJson).get("id").asText();
 
         mockMvc.perform(put("/todos/{id}", todo_id)
                         .header("Authorization", "Bearer " + token)
