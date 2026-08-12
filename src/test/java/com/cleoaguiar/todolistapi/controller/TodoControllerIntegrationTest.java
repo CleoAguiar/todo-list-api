@@ -17,6 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -79,5 +80,43 @@ public class TodoControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("My title"))
                 .andExpect(jsonPath("$.description").value("My description"));
+    }
+
+    @Test
+    void shouldListTodosSuccessfully() throws Exception {
+        TodoRequest first_request = new TodoRequest(
+                "My title One",
+                "My description One",
+                TodoStatus.TODO
+        );
+
+        TodoRequest second_request = new TodoRequest(
+                "My title Two",
+                "My description Two",
+                TodoStatus.TODO
+        );
+
+        mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(first_request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title One"))
+                .andExpect(jsonPath("$.description").value("My description One"));
+
+        mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(second_request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title Two"))
+                .andExpect(jsonPath("$.description").value("My description Two"));
+
+        mockMvc.perform(get("/todos")
+                        .param("page", "0")
+                        .param("limit", "10")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2));
     }
 }
