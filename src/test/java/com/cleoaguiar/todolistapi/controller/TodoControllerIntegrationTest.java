@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -118,5 +119,43 @@ public class TodoControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2));
+    }
+
+    @Test
+    void shouldUpdateTodoSuccessfully() throws Exception {
+        String todo_id;
+
+        TodoRequest request = new TodoRequest(
+                "My title",
+                "My description",
+                TodoStatus.TODO
+        );
+
+        TodoRequest request_updated = new TodoRequest(
+                "My title Updated",
+                "My description Updated",
+                TodoStatus.TODO
+        );
+
+        String responseJson = mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title"))
+                .andExpect(jsonPath("$.description").value("My description"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        todo_id = objectMapper.readTree(responseJson).get("id").asText();
+
+        mockMvc.perform(put("/todos/{id}", todo_id)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request_updated)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("My title Updated"))
+                .andExpect(jsonPath("$.description").value("My description Updated"));
     }
 }
