@@ -17,6 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -155,5 +156,31 @@ public class TodoControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("My title Updated"))
                 .andExpect(jsonPath("$.description").value("My description Updated"));
+    }
+
+    @Test
+    void shouldDeleteTodoSuccessfully() throws Exception {
+        TodoRequest request = new TodoRequest(
+                "My title",
+                "My description",
+                TodoStatus.TODO
+        );
+
+        String responseJson = mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title"))
+                .andExpect(jsonPath("$.description").value("My description"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String todo_id = objectMapper.readTree(responseJson).get("id").asText();
+
+        mockMvc.perform(delete("/todos/{id}", todo_id)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
     }
 }
