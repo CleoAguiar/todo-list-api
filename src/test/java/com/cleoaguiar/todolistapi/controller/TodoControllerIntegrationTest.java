@@ -6,7 +6,6 @@ import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
 import com.cleoaguiar.todolistapi.enums.TodoStatus;
 import com.cleoaguiar.todolistapi.repository.TodoRepository;
 import com.cleoaguiar.todolistapi.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -182,5 +181,63 @@ public class TodoControllerIntegrationTest {
         mockMvc.perform(delete("/todos/{id}", todo_id)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenAccessingAnotherUsersTodo() throws Exception {
+        TodoRequest request = new TodoRequest(
+                "My title",
+                "My description",
+                TodoStatus.TODO
+        );
+
+        String responseJson = mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("My title"))
+                .andExpect(jsonPath("$.description").value("My description"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String todoId = objectMapper.readTree(responseJson).get("id").asText();
+
+        UserRegisterRequest userRequest = new UserRegisterRequest(
+                "user",
+                "user@email.com",
+                "654321");
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(status().isCreated());
+
+        AuthRequest loginRequest = new AuthRequest(
+                "user@email.com",
+                "654321");
+
+        String loginResponse = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String userToken = objectMapper.readTree(loginResponse).get("token").asText();
+
+        TodoRequest updateRequest = new TodoRequest(
+                "User title",
+                "User description",
+                TodoStatus.TODO
+        );
+
+        mockMvc.perform(put("/todos/{id}", todoId)
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isForbidden());
     }
 }
