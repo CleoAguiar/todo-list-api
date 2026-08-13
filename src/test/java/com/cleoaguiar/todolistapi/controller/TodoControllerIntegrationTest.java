@@ -4,8 +4,6 @@ import com.cleoaguiar.todolistapi.dto.AuthRequest;
 import com.cleoaguiar.todolistapi.dto.TodoRequest;
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
 import com.cleoaguiar.todolistapi.enums.TodoStatus;
-import com.cleoaguiar.todolistapi.repository.TodoRepository;
-import com.cleoaguiar.todolistapi.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,14 +28,22 @@ public class TodoControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TodoRepository todoRepository;
-
     private final ObjectMapper objectMapper =  new ObjectMapper();
     private String token;
+
+    private String login(String email, String password) throws Exception {
+        AuthRequest loginRequest = new AuthRequest(email, password);
+
+        String responseJson = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readTree(responseJson).get("token").asText();
+    }
 
     @BeforeEach
     void setup() throws Exception {
@@ -51,26 +57,27 @@ public class TodoControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        AuthRequest loginRequest = new AuthRequest(
+        this.token = login(
                 "cleo@email.com",
                 "123456");
+    }
 
-        String responseJson = mockMvc.perform(post("/auth/login")
+    private String createTodo(TodoRequest todoRequest, String token) throws Exception {
+        return mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
+                        .content(objectMapper.writeValueAsString(todoRequest)))
+                .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-
-        this.token = objectMapper.readTree(responseJson).get("token").asText();
     }
 
     @Test
     void shouldCreateTodoSuccessfully() throws Exception {
         TodoRequest request = new TodoRequest(
-                "My title",
-                "My description",
+                "Todo title",
+                "Todo description",
                 TodoStatus.TODO
         );
 
@@ -79,39 +86,39 @@ public class TodoControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title"))
-                .andExpect(jsonPath("$.description").value("My description"));
+                .andExpect(jsonPath("$.title").value("Todo title"))
+                .andExpect(jsonPath("$.description").value("Todo description"));
     }
 
     @Test
     void shouldListTodosSuccessfully() throws Exception {
-        TodoRequest first_request = new TodoRequest(
-                "My title One",
-                "My description One",
+        TodoRequest firstRequest = new TodoRequest(
+                "Todo title One",
+                "Todo description One",
                 TodoStatus.TODO
         );
 
-        TodoRequest second_request = new TodoRequest(
-                "My title Two",
-                "My description Two",
+        TodoRequest secondRequest = new TodoRequest(
+                "Todo title Two",
+                "Todo description Two",
                 TodoStatus.TODO
         );
 
         mockMvc.perform(post("/todos")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(first_request)))
+                        .content(objectMapper.writeValueAsString(firstRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title One"))
-                .andExpect(jsonPath("$.description").value("My description One"));
+                .andExpect(jsonPath("$.title").value("Todo title One"))
+                .andExpect(jsonPath("$.description").value("Todo description One"));
 
         mockMvc.perform(post("/todos")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(second_request)))
+                        .content(objectMapper.writeValueAsString(secondRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title Two"))
-                .andExpect(jsonPath("$.description").value("My description Two"));
+                .andExpect(jsonPath("$.title").value("Todo title Two"))
+                .andExpect(jsonPath("$.description").value("Todo description Two"));
 
         mockMvc.perform(get("/todos")
                         .param("page", "0")
@@ -124,61 +131,41 @@ public class TodoControllerIntegrationTest {
     @Test
     void shouldUpdateTodoSuccessfully() throws Exception {
         TodoRequest request = new TodoRequest(
-                "My title",
-                "My description",
+                "Todo title",
+                "Todo description",
                 TodoStatus.TODO
         );
 
-        TodoRequest request_updated = new TodoRequest(
-                "My title Updated",
-                "My description Updated",
+        TodoRequest requestUpdated = new TodoRequest(
+                "Updated todo title",
+                "Updated todo description",
                 TodoStatus.TODO
         );
 
-        String responseJson = mockMvc.perform(post("/todos")
+        String responseJson = createTodo(request, token);
+        String todoId = objectMapper.readTree(responseJson).get("id").asText();
+
+        mockMvc.perform(put("/todos/{id}", todoId)
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title"))
-                .andExpect(jsonPath("$.description").value("My description"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String todo_id = objectMapper.readTree(responseJson).get("id").asText();
-
-        mockMvc.perform(put("/todos/{id}", todo_id)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request_updated)))
+                        .content(objectMapper.writeValueAsString(requestUpdated)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("My title Updated"))
-                .andExpect(jsonPath("$.description").value("My description Updated"));
+                .andExpect(jsonPath("$.title").value("Updated todo title"))
+                .andExpect(jsonPath("$.description").value("Updated todo description"));
     }
 
     @Test
     void shouldDeleteTodoSuccessfully() throws Exception {
         TodoRequest request = new TodoRequest(
-                "My title",
-                "My description",
+                "Todo title",
+                "Todo description",
                 TodoStatus.TODO
         );
 
-        String responseJson = mockMvc.perform(post("/todos")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title"))
-                .andExpect(jsonPath("$.description").value("My description"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        String responseJson = createTodo(request, token);
+        String todoId = objectMapper.readTree(responseJson).get("id").asText();;
 
-        String todo_id = objectMapper.readTree(responseJson).get("id").asText();
-
-        mockMvc.perform(delete("/todos/{id}", todo_id)
+        mockMvc.perform(delete("/todos/{id}", todoId)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
     }
@@ -186,22 +173,12 @@ public class TodoControllerIntegrationTest {
     @Test
     void shouldReturnForbiddenWhenAccessingAnotherUsersTodo() throws Exception {
         TodoRequest request = new TodoRequest(
-                "My title",
-                "My description",
+                "Owner todo title",
+                "Owner todo description",
                 TodoStatus.TODO
         );
 
-        String responseJson = mockMvc.perform(post("/todos")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("My title"))
-                .andExpect(jsonPath("$.description").value("My description"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
+        String responseJson = createTodo(request, token);
         String todoId = objectMapper.readTree(responseJson).get("id").asText();
 
         UserRegisterRequest userRequest = new UserRegisterRequest(
@@ -214,23 +191,14 @@ public class TodoControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isCreated());
 
-        AuthRequest loginRequest = new AuthRequest(
+        String userToken = login(
                 "user@email.com",
-                "654321");
-
-        String loginResponse = mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String userToken = objectMapper.readTree(loginResponse).get("token").asText();
+                "654321"
+        );
 
         TodoRequest updateRequest = new TodoRequest(
-                "User title",
-                "User description",
+                "Todo created by another user",
+                "Todo created by another user description",
                 TodoStatus.TODO
         );
 
