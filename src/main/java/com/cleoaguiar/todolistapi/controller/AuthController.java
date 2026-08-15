@@ -8,6 +8,7 @@ import com.cleoaguiar.todolistapi.exception.ErrorResponse;
 import com.cleoaguiar.todolistapi.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -36,11 +37,31 @@ public class AuthController {
             description = "Cria uma conta de usuário"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos",
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Usuário criado com sucesso"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "O servidor não conseguiu entender a solicitação.",
+                                    value = """
+                                            {
+                                                "timestamp": "2026-08-15T20:57:43.94644522",
+                                                "status": 400,
+                                                "error": "Bad Request",
+                                                "message": "Erro de validação.",
+                                                "errors": {
+                                                    "password": "A senha é obrigatória.",
+                                                    "email": "O e-mail é obrigatório.",
+                                                    "username": "O nome do usuário é obrigatório."
+                                                }
+                                            }
+                                            """
+                            )
                     ))
 
     })
@@ -55,16 +76,32 @@ public class AuthController {
             description = "Autentica o usuário e retorna um token JWT"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Login realizado com sucesso",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class)
+                            schema = @Schema(implementation = AuthResponse.class),
+                            examples = @ExampleObject(
+                                    name = "Solicitação bem-sucedida.",
+                                    value = """
+                                            {
+                                                "token": "eyJhbGciOiJIU..."
+                                            }
+                                            """
+                            )
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "Credencias inválidas",
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Credencias inválidas",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "O acesso ao recurso é proibido.",
+                                    value = "1"
+                            )
                     ))
     })
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest authRequest) {
