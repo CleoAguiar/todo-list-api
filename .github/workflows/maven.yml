@@ -27,3 +27,5 @@ jobs:
 
       - name: Build com Maven
         run: mvn clean verify
+        env:
+          JWT_SECRET: test-jwt-secret-key-with-at-least-32-characters
