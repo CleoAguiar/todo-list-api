@@ -82,7 +82,15 @@ public class TodoController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "",
-                                    value = "1"
+                                    value = """
+                                             {
+                                                "timestamp": "2026-08-15T21:17:17",
+                                                "status": 403,
+                                                "error": "Forbidden",
+                                                "message": "Você não tem permissão para acessar esta tarefa.",
+                                                "errors": null
+                                             }
+                                            """
                             )
                     ))
     })
@@ -148,7 +156,15 @@ public class TodoController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "O acesso ao recurso é proibido.",
-                                    value = "1"
+                                    value = """
+                                             {
+                                                "timestamp": "2026-08-15T21:17:17",
+                                                "status": 403,
+                                                "error": "Forbidden",
+                                                "message": "Você não tem permissão para acessar esta tarefa.",
+                                                "errors": null
+                                             }
+                                            """
                             )
                     ))
     })
@@ -259,7 +275,15 @@ public class TodoController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "O acesso ao recurso é proibido.",
-                                    value = "1"
+                                    value = """
+                                             {
+                                                "timestamp": "2026-08-15T21:17:17",
+                                                "status": 403,
+                                                "error": "Forbidden",
+                                                "message": "Você não tem permissão para acessar esta tarefa.",
+                                                "errors": null
+                                             }
+                                            """
                             )
                     ))
     })
@@ -337,7 +361,15 @@ public class TodoController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "O acesso ao recurso é proibido.",
-                                    value = "1"
+                                    value = """
+                                             {
+                                                "timestamp": "2026-08-15T21:17:17",
+                                                "status": 403,
+                                                "error": "Forbidden",
+                                                "message": "Você não tem permissão para acessar esta tarefa.",
+                                                "errors": null
+                                             }
+                                            """
                             )
                     ))
     })
