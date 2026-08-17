@@ -1,63 +1,68 @@
+<p align="right">
+  <b>🇺🇸 English</b> | <a href="./README.pt-br.md">🇧🇷 Português</a>
+</p>
+
 # 📝 Todo List API
 
-Uma API RESTful robusta e escalável para gerenciamento de tarefas (*To-Do List*), desenvolvida em **Java 25** com **Spring Boot**. A aplicação conta com autenticação e autorização via **JWT (JSON Web Token)**, persistência em banco de dados **PostgreSQL**, validações de entrada e documentação interativa via **Swagger / OpenAPI**.
+A robust and scalable RESTful API for managing to-do lists, built with **Java 25** and **Spring Boot**. The application features authentication and authorization using **JWT (JSON Web Token)**, persistence with **PostgreSQL**, request validation, and interactive documentation via **Swagger / OpenAPI**.
 
 ---
 
-## 📌 Sumário
+## 📌 Table of Contents
 
-- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Arquitetura do Projeto](#-arquitetura-do-projeto)
-- [Pré-requisitos](#-pré-requisitos)
-- [Variáveis de Ambiente](#-variáveis-de-ambiente)
-- [Como Executar o Projeto](#-como-executar-o-projeto)
-  - [1. Execução Local](#1-execução-local)
-  - [2. Execução com Docker](#2-execução-com-docker)
-  - [3. Execução dos Testes](#3-execução-dos-testes)
-- [Documentação da API (Swagger/OpenAPI)](#-documentação-da-api-swaggeropenapi)
-- [Autenticação JWT](#-autenticação-jwt)
-- [Endpoints da API & Exemplos](#-endpoints-da-api--exemplos)
-  - [Autenticação](#autenticação)
-  - [Tarefas (Todos)](#tarefas-todos)
+- [Technologies Used](#-technologies-used)
+- [Project Architecture](#-project-architecture)
+- [Prerequisites](#-prerequisites)
+- [Environment Variables](#-environment-variables)
+- [How to Run the Project](#-how-to-run-the-project)
+  - [1. Running Locally](#1-running-locally)
+  - [2. Running with Docker](#2-running-with-docker)
+  - [3. Running Tests](#3-running-tests)
+- [API Documentation (Swagger/OpenAPI)](#-api-documentation-swaggeropenapi)
+- [JWT Authentication](#-jwt-authentication)
+- [API Endpoints & Examples](#-api-endpoints--examples)
+  - [Authentication](#authentication)
+  - [Tasks (Todos)](#tasks-todos)
+- [Error Handling](#-error-handling)
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## 🚀 Technologies Used
 
-- **Linguagem:** [Java 25](https://openjdk.org/projects/jdk/25/)
+- **Language:** [Java 25](https://openjdk.org/projects/jdk/25/)
 - **Framework:** [Spring Boot 4.1.0](https://spring.io/projects/spring-boot)
-- **Segurança:** [Spring Security](https://spring.io/projects/spring-security) & [JJWT (io.jsonwebtoken)](https://github.com/jwtk/jjwt)
-- **Persistência de Dados:** [Spring Data JPA](https://spring.io/projects/spring-data-jpa) & [Hibernate](https://hibernate.org/)
-- **Bancos de Dados:**
-  - [PostgreSQL](https://www.postgresql.org/) (Ambiente de Produção e Desenvolvimento)
-  - [H2 Database](https://www.h2database.com/) (Banco em memória para testes automatizados)
-- **Validação:** [Jakarta Validation / Hibernate Validator](https://beanvalidation.org/)
-- **Documentação da API:** [SpringDoc OpenAPI UI / Swagger](https://springdoc.org/)
-- **Gerenciador de Dependências:** [Apache Maven](https://maven.apache.org/)
-- **Containerização:** [Docker](https://www.docker.com/)
+- **Security:** [Spring Security](https://spring.io/projects/spring-security) & [JJWT (io.jsonwebtoken)](https://github.com/jwtk/jjwt)
+- **Data Persistence:** [Spring Data JPA](https://spring.io/projects/spring-data-jpa) & [Hibernate](https://hibernate.org/)
+- **Databases:**
+  - [PostgreSQL](https://www.postgresql.org/) (Production & Development runtime)
+  - [H2 Database](https://www.h2database.com/) (In-memory database for automated tests)
+- **Validation:** [Jakarta Validation / Hibernate Validator](https://beanvalidation.org/)
+- **API Documentation:** [SpringDoc OpenAPI UI / Swagger](https://springdoc.org/)
+- **Build Tool:** [Apache Maven](https://maven.apache.org/)
+- **Containerization:** [Docker](https://www.docker.com/)
 
 ---
 
-## 🏗️ Arquitetura do Projeto
+## 🏗️ Project Architecture
 
-O projeto segue o padrão de **Arquitetura em Camadas (Layered Architecture)**, garantindo separação clara de responsabilidades, alta coesão e baixo acoplamento:
+The project follows a **Layered Architecture**, ensuring clear separation of concerns, high cohesion, and low coupling:
 
 ```text
 src/main/java/com/cleoaguiar/todolistapi/
 │
-├── config/              # Configurações de segurança, filtros JWT e OpenAPI/Swagger
+├── config/              # Security settings, JWT filters, and OpenAPI/Swagger configuration
 │   ├── JwtAuthenticationFilter.java
 │   ├── OpenApiConfig.java
 │   └── SecurityConfig.java
 │
-├── controller/          # Controladores REST e interfaces de documentação
-│   ├── api/             # Interfaces com anotações Swagger/OpenAPI
+├── controller/          # REST controllers and documentation interfaces
+│   ├── api/             # Interfaces with Swagger/OpenAPI annotations
 │   │   ├── AuthApi.java
 │   │   └── TodoApi.java
 │   ├── AuthController.java
 │   └── TodoController.java
 │
-├── dto/                 # Records DTO (Data Transfer Objects) para requisição e resposta
+├── dto/                 # DTOs (Data Transfer Objects / Records) for requests and responses
 │   ├── AuthRequest.java
 │   ├── AuthResponse.java
 │   ├── TodoRequest.java
@@ -65,24 +70,24 @@ src/main/java/com/cleoaguiar/todolistapi/
 │   ├── UserRegisterRequest.java
 │   └── UserResponse.java
 │
-├── entity/              # Entidades mapeadas para o banco de dados (JPA)
+├── entity/              # JPA database entities
 │   ├── Todo.java
 │   └── User.java
 │
-├── enums/               # Enumerações (ex: status das tarefas)
+├── enums/               # Enums (e.g., task status)
 │   └── TodoStatus.java
 │
-├── exception/           # Tratamento global de erros e exceções personalizadas
+├── exception/           # Global exception handling and custom exceptions
 │   ├── ErrorResponse.java
 │   ├── ForbiddenException.java
 │   ├── GlobalExceptionHandler.java
 │   └── TodoNotFoundException.java
 │
-├── repository/          # Interfaces de acesso a dados (Spring Data JPA)
+├── repository/          # Data access interfaces (Spring Data JPA)
 │   ├── TodoRepository.java
 │   └── UserRepository.java
 │
-└── service/             # Camada de regras de negócio e geração/validação JWT
+└── service/             # Business logic layer and JWT generation/validation
     ├── AuthService.java
     ├── JwtService.java
     └── TodoService.java
@@ -90,42 +95,42 @@ src/main/java/com/cleoaguiar/todolistapi/
 
 ---
 
-## 📋 Pré-requisitos
+## 📋 Prerequisites
 
-Antes de iniciar, certifique-se de ter instalado em sua máquina:
+Before running the application, make sure you have installed:
 
-- **JDK 25** ou superior ([Eclipse Temurin](https://adoptium.net/) recomendado)
+- **JDK 25** or higher ([Eclipse Temurin](https://adoptium.net/) recommended)
 - **Git**
-- **Docker** (opcional, para rodar o banco de dados ou a aplicação completa em container)
-- **Maven 3.9+** (opcional, pois o projeto inclui o Maven Wrapper `./mvnw`)
+- **Docker** (optional, to run PostgreSQL or the entire application in a container)
+- **Maven 3.9+** (optional, as the repository includes the Maven Wrapper `./mvnw`)
 
 ---
 
-## 🔐 Variáveis de Ambiente
+## 🔐 Environment Variables
 
-A aplicação necessita das seguintes variáveis de ambiente para conectar-se ao banco de dados e assinar tokens JWT:
+The application requires the following environment variables to connect to the database and sign JWT tokens:
 
-| Variável | Descrição | Exemplo | Obrigatório |
+| Variable | Description | Example | Required |
 | --- | --- | --- | --- |
-| `DB_URL` | URL JDBC de conexão com o PostgreSQL | `jdbc:postgresql://localhost:5432/todolist` | Sim |
-| `DB_USERNAME` | Usuário do banco de dados | `postgres` | Sim |
-| `DB_PASSWORD` | Senha do banco de dados | `postgres` | Sim |
-| `JWT_SECRET` | Chave secreta usada para assinar/validar tokens JWT (mín. 256 bits / 32 caracteres) | `sua-chave-secreta-super-segura-com-minimo-de-32-chars` | Sim |
+| `DB_URL` | JDBC URL for PostgreSQL connection | `jdbc:postgresql://localhost:5432/todolist` | Yes |
+| `DB_USERNAME` | Database username | `postgres` | Yes |
+| `DB_PASSWORD` | Database password | `postgres` | Yes |
+| `JWT_SECRET` | Secret key used to sign and validate JWT tokens (min. 256 bits / 32 characters) | `your-super-secret-jwt-key-with-at-least-32-chars` | Yes |
 
 ---
 
-## ⚙️ Como Executar o Projeto
+## ⚙️ How to Run the Project
 
-### 1. Execução Local
+### 1. Running Locally
 
-#### Passo 1: Clonar o repositório
+#### Step 1: Clone the repository
 ```bash
 git clone https://github.com/CleoAguiar/todo-list-api.git
 cd todo-list-api
 ```
 
-#### Passo 2: Subir uma instância do PostgreSQL
-Você pode iniciar rapidamente um container PostgreSQL via Docker:
+#### Step 2: Start a PostgreSQL database
+You can start a PostgreSQL container using Docker:
 
 ```bash
 docker run --name postgres-todo \
@@ -136,14 +141,14 @@ docker run --name postgres-todo \
   -d postgres:alpine
 ```
 
-#### Passo 3: Definir as variáveis de ambiente e rodar a aplicação
+#### Step 3: Set environment variables and start the application
 
 - **Linux / macOS (Bash):**
   ```bash
   export DB_URL="jdbc:postgresql://localhost:5432/todolist"
   export DB_USERNAME="postgres"
   export DB_PASSWORD="postgres"
-  export JWT_SECRET="minha-chave-secreta-jwt-super-segura-com-32-bytes-ou-mais"
+  export JWT_SECRET="your-super-secret-jwt-key-with-at-least-32-chars"
 
   ./mvnw spring-boot:run
   ```
@@ -153,7 +158,7 @@ docker run --name postgres-todo \
   $env:DB_URL="jdbc:postgresql://localhost:5432/todolist"
   $env:DB_USERNAME="postgres"
   $env:DB_PASSWORD="postgres"
-  $env:JWT_SECRET="minha-chave-secreta-jwt-super-segura-com-32-bytes-ou-mais"
+  $env:JWT_SECRET="your-super-secret-jwt-key-with-at-least-32-chars"
 
   .\mvnw.cmd spring-boot:run
   ```
@@ -163,25 +168,25 @@ docker run --name postgres-todo \
   set DB_URL=jdbc:postgresql://localhost:5432/todolist
   set DB_USERNAME=postgres
   set DB_PASSWORD=postgres
-  set JWT_SECRET=minha-chave-secreta-jwt-super-segura-com-32-bytes-ou-mais
+  set JWT_SECRET=your-super-secret-jwt-key-with-at-least-32-chars
 
   mvnw.cmd spring-boot:run
   ```
 
 ---
 
-### 2. Execução com Docker
+### 2. Running with Docker
 
-O projeto possui um `Dockerfile` multi-stage pronto para produção.
+The project includes a production-ready multi-stage `Dockerfile`.
 
-#### Opção A: Criando uma rede Docker para integrar App e Banco
+#### Option A: Creating a Docker network to connect App and Database
 
-1. **Crie a rede Docker:**
+1. **Create a Docker network:**
    ```bash
    docker network create todo-network
    ```
 
-2. **Inicie o banco PostgreSQL na rede:**
+2. **Start the PostgreSQL container inside the network:**
    ```bash
    docker run --name postgres-todo \
      --network todo-network \
@@ -192,12 +197,12 @@ O projeto possui um `Dockerfile` multi-stage pronto para produção.
      -d postgres:alpine
    ```
 
-3. **Construa a imagem da aplicação:**
+3. **Build the application image:**
    ```bash
    docker build -t todo-list-api .
    ```
 
-4. **Inicie o container da aplicação:**
+4. **Run the application container:**
    - **Linux / macOS (Bash):**
      ```bash
      docker run -d \
@@ -207,7 +212,7 @@ O projeto possui um `Dockerfile` multi-stage pronto para produção.
        -e DB_URL="jdbc:postgresql://postgres-todo:5432/todolist" \
        -e DB_USERNAME="postgres" \
        -e DB_PASSWORD="postgres" \
-       -e JWT_SECRET="minha-chave-secreta-jwt-super-segura-com-32-bytes-ou-mais" \
+       -e JWT_SECRET="your-super-secret-jwt-key-with-at-least-32-chars" \
        todo-list-api
      ```
    - **Windows (PowerShell):**
@@ -219,17 +224,17 @@ O projeto possui um `Dockerfile` multi-stage pronto para produção.
        -e DB_URL="jdbc:postgresql://postgres-todo:5432/todolist" `
        -e DB_USERNAME="postgres" `
        -e DB_PASSWORD="postgres" `
-       -e JWT_SECRET="minha-chave-secreta-jwt-super-segura-com-32-bytes-ou-mais" `
+       -e JWT_SECRET="your-super-secret-jwt-key-with-at-least-32-chars" `
        todo-list-api
      ```
 
-A API estará disponível em: `http://localhost:8080`
+The API will be available at: `http://localhost:8080`
 
 ---
 
-### 3. Execução dos Testes
+### 3. Running Tests
 
-Os testes automatizados utilizam banco de dados **H2 em memória** e não necessitam de configuração externa de banco:
+Automated tests run against an **in-memory H2 database** and do not require external database setup:
 
 - **Linux / macOS:**
   ```bash
@@ -242,75 +247,75 @@ Os testes automatizados utilizam banco de dados **H2 em memória** e não necess
 
 ---
 
-## 📖 Documentação da API (Swagger/OpenAPI)
+## 📖 API Documentation (Swagger/OpenAPI)
 
-A documentação interativa com Swagger UI é gerada automaticamente pelo SpringDoc:
+Interactive API documentation via Swagger UI is automatically generated with SpringDoc:
 
-- **Swagger UI:** [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) (ou `http://localhost:8080/swagger-ui.html`)
-- **Especificação OpenAPI JSON:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- **Swagger UI:** [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) (or `http://localhost:8080/swagger-ui.html`)
+- **OpenAPI JSON Spec:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
 ---
 
-## 🔑 Autenticação JWT
+## 🔑 JWT Authentication
 
-A API utiliza autenticação baseada em tokens **JWT (JSON Web Token)**:
+The API uses **JWT (JSON Web Token)** based authentication:
 
-1. Registre um novo usuário através do endpoint `POST /auth/register`.
-2. Autentique-se pelo endpoint `POST /auth/login` informando `email` e `password`.
-3. A resposta conterá um token de autenticação:
+1. Register a new user at `POST /auth/register`.
+2. Authenticate at `POST /auth/login` providing `email` and `password`.
+3. The response will return an authentication token:
    ```json
    {
      "token": "eyJhbGciOiJIUzI1NiJ9..."
    }
    ```
-4. Para acessar endpoints protegidos (`/todos/**`), adicione o cabeçalho HTTP:
+4. To access protected endpoints (`/todos/**`), include the following HTTP header:
    ```http
-   Authorization: Bearer <SEU_TOKEN_JWT>
+   Authorization: Bearer <YOUR_JWT_TOKEN>
    ```
 
-> ℹ️ **Nota de Segurança:** Cada usuário tem acesso estrito e exclusivo apenas às suas próprias tarefas. Tentativas de acessar tarefas de terceiros retornarão `403 Forbidden`.
+> ℹ️ **Security Note:** Each user has strictly isolated access to their own tasks. Attempting to access tasks belonging to another user will return `403 Forbidden`.
 
 ---
 
-## 📡 Endpoints da API & Exemplos
+## 📡 API Endpoints & Examples
 
-### Autenticação
+### Authentication
 
-#### 1. Registrar Usuário
-- **Rota:** `POST /auth/register`
-- **Autenticação:** Pública
+#### 1. Register User
+- **Endpoint:** `POST /auth/register`
+- **Authentication:** Public
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "Jose da Silva",
     "email": "jose@email.com",
-    "password": "senhaSegura123"
+    "password": "securePassword123"
   }'
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `201 Created`
 
 ---
 
-#### 2. Autenticar (Login)
-- **Rota:** `POST /auth/login`
-- **Autenticação:** Pública
+#### 2. Authenticate (Login)
+- **Endpoint:** `POST /auth/login`
+- **Authentication:** Public
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "jose@email.com",
-    "password": "senhaSegura123"
+    "password": "securePassword123"
   }'
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `200 OK`
 ```json
 {
@@ -320,33 +325,33 @@ curl -X POST http://localhost:8080/auth/login \
 
 ---
 
-### Tarefas (Todos)
+### Tasks (Todos)
 
-> ⚠️ Todos os endpoints abaixo exigem o cabeçalho `Authorization: Bearer <TOKEN>`.
+> ⚠️ All endpoints below require the `Authorization: Bearer <TOKEN>` header.
 
 ---
 
-#### 1. Listar Tarefas (Paginado)
-- **Rota:** `GET /todos?page=0&limit=10`
-- **Parâmetros de Consulta (Query Params):**
-  - `page` *(opcional, padrão `0`)*: Número da página (base zero).
-  - `limit` *(opcional, padrão `10`)*: Quantidade de registros por página.
+#### 1. List Tasks (Paginated)
+- **Endpoint:** `GET /todos?page=0&limit=10`
+- **Query Parameters:**
+  - `page` *(optional, default `0`)*: Page number (zero-based).
+  - `limit` *(optional, default `10`)*: Number of items per page.
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X GET "http://localhost:8080/todos?page=0&limit=10" \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `200 OK`
 ```json
 {
   "content": [
     {
       "id": 1,
-      "title": "Estudar Spring Boot",
-      "description": "Revisar documentação OpenAPI e Spring Security",
+      "title": "Study Spring Boot",
+      "description": "Review OpenAPI documentation and Spring Security",
       "status": "TODO",
       "createdAt": "2026-08-17T10:00:00",
       "updatedAt": "2026-08-17T10:00:00"
@@ -382,29 +387,29 @@ curl -X GET "http://localhost:8080/todos?page=0&limit=10" \
 
 ---
 
-#### 2. Criar Tarefa
-- **Rota:** `POST /todos`
-- **Valores permitidos para `status`:** `TODO`, `IN_PROGRESS`, `DONE`
+#### 2. Create Task
+- **Endpoint:** `POST /todos`
+- **Allowed values for `status`:** `TODO`, `IN_PROGRESS`, `DONE`
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X POST http://localhost:8080/todos \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
-    "title": "Estudar Spring Boot",
-    "description": "Revisar anotações OpenAPI e testes unitários",
+    "title": "Study Spring Boot",
+    "description": "Review OpenAPI annotations and unit tests",
     "status": "TODO"
   }'
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `201 Created`
 ```json
 {
   "id": 1,
-  "title": "Estudar Spring Boot",
-  "description": "Revisar anotações OpenAPI e testes unitários",
+  "title": "Study Spring Boot",
+  "description": "Review OpenAPI annotations and unit tests",
   "status": "TODO",
   "createdAt": "2026-08-17T10:00:00.000",
   "updatedAt": "2026-08-17T10:00:00.000"
@@ -413,22 +418,22 @@ curl -X POST http://localhost:8080/todos \
 
 ---
 
-#### 3. Buscar Tarefa por ID
-- **Rota:** `GET /todos/{id}`
+#### 3. Get Task by ID
+- **Endpoint:** `GET /todos/{id}`
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X GET http://localhost:8080/todos/1 \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `200 OK`
 ```json
 {
   "id": 1,
-  "title": "Estudar Spring Boot",
-  "description": "Revisar anotações OpenAPI e testes unitários",
+  "title": "Study Spring Boot",
+  "description": "Review OpenAPI annotations and unit tests",
   "status": "TODO",
   "createdAt": "2026-08-17T10:00:00.000",
   "updatedAt": "2026-08-17T10:00:00.000"
@@ -437,28 +442,28 @@ curl -X GET http://localhost:8080/todos/1 \
 
 ---
 
-#### 4. Atualizar Tarefa
-- **Rota:** `PUT /todos/{id}`
+#### 4. Update Task
+- **Endpoint:** `PUT /todos/{id}`
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X PUT http://localhost:8080/todos/1 \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
-    "title": "Estudar Spring Boot e Docker",
-    "description": "Concluído o estudo de OpenAPI, agora testando com Docker",
+    "title": "Study Spring Boot and Docker",
+    "description": "Completed OpenAPI study, now testing with Docker",
     "status": "IN_PROGRESS"
   }'
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `200 OK`
 ```json
 {
   "id": 1,
-  "title": "Estudar Spring Boot e Docker",
-  "description": "Concluído o estudo de OpenAPI, agora testando com Docker",
+  "title": "Study Spring Boot and Docker",
+  "description": "Completed OpenAPI study, now testing with Docker",
   "status": "IN_PROGRESS",
   "createdAt": "2026-08-17T10:00:00.000",
   "updatedAt": "2026-08-17T10:35:00.000"
@@ -467,23 +472,23 @@ curl -X PUT http://localhost:8080/todos/1 \
 
 ---
 
-#### 5. Excluir Tarefa
-- **Rota:** `DELETE /todos/{id}`
+#### 5. Delete Task
+- **Endpoint:** `DELETE /todos/{id}`
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X DELETE http://localhost:8080/todos/1 \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-**Resposta:**
+**Response:**
 - **Status:** `204 No Content`
 
 ---
 
-## ⚠️ Estrutura de Erros
+## ⚠️ Error Handling
 
-Em caso de erros na requisição (validação, autenticação, recurso não encontrado), a API retorna o seguinte formato padronizado:
+In case of errors (validation failures, authentication issues, resource not found), the API returns a standardized JSON error structure:
 
 ```json
 {
