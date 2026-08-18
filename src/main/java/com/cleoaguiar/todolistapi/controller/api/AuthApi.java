@@ -69,7 +69,7 @@ public interface AuthApi {
     ResponseEntity<UserResponse> register(UserRegisterRequest userRegisterRequest);
 
     @Operation(
-            summary = "Registrar login",
+            summary = "Autenticar usuário",
             description = "Autentica o usuário e retorna um token JWT"
     )
     @ApiResponses(value = {
