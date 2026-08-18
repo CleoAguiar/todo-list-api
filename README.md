@@ -8,6 +8,12 @@ A robust and scalable RESTful API for managing to-do lists, built with **Java 25
 
 ---
 
+## 📌 Project Reference
+
+This project was developed based on the [Todo List API project from roadmap.sh](https://roadmap.sh/projects/todo-list-api).
+
+---
+
 ## 📌 Table of Contents
 
 - [Technologies Used](#-technologies-used)

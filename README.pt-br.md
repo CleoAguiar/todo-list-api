@@ -8,6 +8,12 @@ Uma API RESTful robusta e escalável para gerenciamento de tarefas (*To-Do List*
 
 ---
 
+## 📌 Referência do Projeto
+
+Este projeto foi desenvolvido com base no [projeto Todo List API do roadmap.sh](https://roadmap.sh/projects/todo-list-api).
+
+---
+
 ## 📌 Sumário
 
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
