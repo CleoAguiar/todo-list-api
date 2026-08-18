@@ -1,5 +1,6 @@
 package com.cleoaguiar.todolistapi.controller;
 
+import com.cleoaguiar.todolistapi.controller.api.AuthApi;
 import com.cleoaguiar.todolistapi.dto.AuthRequest;
 import com.cleoaguiar.todolistapi.dto.AuthResponse;
 import com.cleoaguiar.todolistapi.dto.UserRegisterRequest;
@@ -15,22 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
     private final AuthService authService;
 
     public AuthController(AuthService service) {
         this.authService = service;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
-        authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @PostMapping("/login")
+    @Override
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest authRequest) {
         String token = authService.login(authRequest);
         return ResponseEntity.ok(new AuthResponse(token));
+    }
+
+    @PostMapping("/register")
+    @Override
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
+        authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

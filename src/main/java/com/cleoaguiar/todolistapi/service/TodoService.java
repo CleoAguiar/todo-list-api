@@ -61,9 +61,16 @@ public class TodoService {
 
     public TodoResponse create(TodoRequest request) {
         User authenticatedUser = getAuthenticatedUser();
+
         Todo todo = new Todo();
+
         todo.setTitle(request.title());
         todo.setDescription(request.description());
+
+        if (request.status() != null) {
+            todo.setStatus(request.status());
+        }
+
         todo.setUser(authenticatedUser);
 
         Todo savedTodo = repository.save(todo);
@@ -85,6 +92,10 @@ public class TodoService {
 
         existingTodo.setTitle(request.title());
         existingTodo.setDescription(request.description());
+
+        if (request.status() != null) {
+            existingTodo.setStatus(request.status());
+        }
 
         Todo updateTodo = repository.save(existingTodo);
 

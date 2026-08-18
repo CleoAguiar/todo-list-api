@@ -1,5 +1,6 @@
 package com.cleoaguiar.todolistapi.controller;
 
+import com.cleoaguiar.todolistapi.controller.api.TodoApi;
 import com.cleoaguiar.todolistapi.dto.TodoRequest;
 import com.cleoaguiar.todolistapi.dto.TodoResponse;
 import com.cleoaguiar.todolistapi.service.TodoService;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/todos")
-public class TodoController {
+public class TodoController implements TodoApi {
     private final TodoService todoService;
 
     public TodoController(TodoService todoService) {
@@ -18,6 +19,7 @@ public class TodoController {
     }
 
     @GetMapping
+    @Override
     public Page<TodoResponse> getAll(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int limit) {
         return todoService.getAll(page, limit);
@@ -25,22 +27,26 @@ public class TodoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public TodoResponse create(@Valid @RequestBody TodoRequest request) {
         return todoService.create(request);
     }
 
     @GetMapping("/{id}")
+    @Override
     public TodoResponse getById(@PathVariable Long id) {
         return todoService.getById(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
     public void delete(@PathVariable Long id) {
         todoService.delete(id);
     }
 
     @PutMapping("/{id}")
+    @Override
     public TodoResponse update(@PathVariable Long id, @Valid @RequestBody TodoRequest request) {
         return todoService.update(id, request);
     }

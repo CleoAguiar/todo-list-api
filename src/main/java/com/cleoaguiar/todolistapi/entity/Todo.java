@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 public class Todo {
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String description;
@@ -24,6 +24,7 @@ public class Todo {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -59,11 +60,21 @@ public class Todo {
         this.description = description;
     }
 
-    public User getUser() { return user; }
+    public User getUser() {
+        return user;
+    }
 
-    public void setUser(User user) { this.user = user; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public TodoStatus getStatus() { return status; }
+    public TodoStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TodoStatus status) {
+        this.status = status;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

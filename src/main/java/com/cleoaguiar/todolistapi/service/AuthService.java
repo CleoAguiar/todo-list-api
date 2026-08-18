@@ -20,24 +20,24 @@ public class AuthService {
     }
 
     public User register(UserRegisterRequest request) {
-        if (repository.existsByEmail(request.getEmail())){
+        if (repository.existsByEmail(request.email())){
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
 
         return repository.save(user);
     }
 
     public String login(AuthRequest authRequest) {
-        User user = repository.findByEmail(authRequest.getEmail())
+        User user = repository.findByEmail(authRequest.email())
                         .orElseThrow(() ->
                                 new IllegalArgumentException("E-mail ou senha inválidos"));
 
-        if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())){
+        if (!passwordEncoder.matches(authRequest.password(), user.getPassword())){
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
