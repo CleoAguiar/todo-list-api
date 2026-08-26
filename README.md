@@ -264,6 +264,10 @@ Interactive API documentation via Swagger UI is automatically generated with Spr
 
 ## 🔑 JWT Authentication
 
+### Authentication flow
+
+![JWT authentication flow](docs/images/jwt-authentication-flow.png)
+
 The API uses **JWT (JSON Web Token)** based authentication:
 
 1. Register a new user at `POST /auth/register`.

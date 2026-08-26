@@ -263,6 +263,10 @@ A documentação interativa com Swagger UI é gerada automaticamente pelo Spring
 
 ## 🔑 Autenticação JWT
 
+### Fluxo de autenticação
+
+![JWT authentication flow](docs/images/jwt-authentication-flow.png)
+
 A API utiliza autenticação baseada em tokens **JWT (JSON Web Token)**:
 
 1. Registre um novo usuário através do endpoint `POST /auth/register`.
